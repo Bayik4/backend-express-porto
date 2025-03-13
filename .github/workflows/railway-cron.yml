@@ -1,0 +1,29 @@
+name: Start/Stop Railway Service
+
+on:
+  schedule:
+    - cron: "0 8 * * *"  # Start pukul 08:00 UTC (sesuaikan zona waktu)
+    - cron: "0 22 * * *"  # Stop pukul 22:00 UTC
+
+jobs:
+  control-railway:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Login to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway login --token $RAILWAY_TOKEN
+
+      - name: Start Service
+        if: github.event.schedule == '0 8 * * *'
+        run: railway up --project 3f4f2470-d29c-441c-ac43-f70651d11222
+
+      - name: Stop Service
+        if: github.event.schedule == '0 22 * * *'
+        run: railway down --project 3f4f2470-d29c-441c-ac43-f70651d11222

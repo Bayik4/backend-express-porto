@@ -2,7 +2,7 @@ name: Start/Stop Railway Service
 
 on:
   schedule:
-    - cron: "0 8 * * *"  # Start pukul 08:00 UTC (sesuaikan zona waktu)
+    - cron: "0 8 * * *"  # Start pukul 08:00 UTC
     - cron: "0 22 * * *"  # Stop pukul 22:00 UTC
 
 jobs:
@@ -18,12 +18,19 @@ jobs:
       - name: Login to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway login --token $RAILWAY_TOKEN
+        run: echo $RAILWAY_TOKEN | railway login --token
 
-      - name: Start Service
-        if: github.event.schedule == '0 8 * * *'
-        run: railway up --project 3f4f2470-d29c-441c-ac43-f70651d11222
-
-      - name: Stop Service
-        if: github.event.schedule == '0 22 * * *'
-        run: railway down --project 3f4f2470-d29c-441c-ac43-f70651d11222
+      - name: Start or Stop Service
+        env:
+          CURRENT_HOUR: ${{ github.event.schedule }}
+        run: |
+          HOUR=$(date -u +"%H")
+          if [ "$HOUR" -eq 8 ]; then
+            echo "Starting Railway Service..."
+            railway up --project 3f4f2470-d29c-441c-ac43-f70651d11222
+          elif [ "$HOUR" -eq 22 ]; then
+            echo "Stopping Railway Service..."
+            railway down --project 3f4f2470-d29c-441c-ac43-f70651d11222
+          else
+            echo "No matching schedule."
+          fi

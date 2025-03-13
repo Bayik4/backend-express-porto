@@ -9,9 +9,15 @@ const dbName = process.env.DB_DATABASE;
 const username = process.env.DB_USERNAME;
 const password = process.env.DB_PASSWORD;
 
-const db = new Sequelize(dbName, username, password, {
-    host,
-    dialect
+const db = new Sequelize(process.env.DB_URL, {
+    dialect,
+    dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+    },
+    logging: false
 });
 
 try {

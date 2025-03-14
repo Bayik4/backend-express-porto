@@ -18,7 +18,7 @@ jobs:
       - name: Login to Railway
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: echo $RAILWAY_TOKEN | railway login --token
+        run: echo $RAILWAY_TOKEN | railway login
 
       - name: Start or Stop Service
         env:
